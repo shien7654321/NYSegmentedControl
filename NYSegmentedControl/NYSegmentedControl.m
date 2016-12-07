@@ -364,6 +364,10 @@
                 }
             }
         }];
+    } else if (panGestureRecognizer.state == UIGestureRecognizerStateBegan) {// FIXME: Suta
+        for (NYSegment *segment in self.segments) {
+            segment.titleLabel.textColor = self.titleTextColor;
+        }
     }
 }
 

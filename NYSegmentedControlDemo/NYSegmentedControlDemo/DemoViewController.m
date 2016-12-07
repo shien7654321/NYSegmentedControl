@@ -115,12 +115,12 @@
     [darkControlExampleView addSubview:purpleSegmentedControl];
     
     // UISwitch style
-    NYSegmentedControl *roundedGreenSegmentedControl = [[NYSegmentedControl alloc] initWithItems:@[@"On", @"Off"]];
+    NYSegmentedControl *roundedGreenSegmentedControl = [[NYSegmentedControl alloc] initWithItems:@[@"开", @"关"]];
     roundedGreenSegmentedControl.borderWidth = 2.0f;
     roundedGreenSegmentedControl.borderColor = [UIColor colorWithWhite:0.15f alpha:1.0f];
-    roundedGreenSegmentedControl.titleFont = [UIFont fontWithName:@"AvenirNext-Medium" size:16.0f];
+    roundedGreenSegmentedControl.titleFont = [UIFont boldSystemFontOfSize:20];
     roundedGreenSegmentedControl.titleTextColor = [UIColor colorWithWhite:0.3f alpha:1.0f];
-    roundedGreenSegmentedControl.selectedTitleFont = [UIFont fontWithName:@"AvenirNext-DemiBold" size:16.0f];
+    roundedGreenSegmentedControl.selectedTitleFont = roundedGreenSegmentedControl.titleFont;
     roundedGreenSegmentedControl.selectedTitleTextColor = [UIColor colorWithWhite:0.2f alpha:1.0f];
     roundedGreenSegmentedControl.drawsGradientBackground = YES;
     roundedGreenSegmentedControl.gradientTopColor = [UIColor colorWithWhite:0.17f alpha:1.0f];
