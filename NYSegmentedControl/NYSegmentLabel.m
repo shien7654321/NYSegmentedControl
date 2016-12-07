@@ -9,21 +9,22 @@
 
 #import "NYSegmentLabel.h"
 
-@implementation NYSegmentLabel {
-    CGSize _textSize;// FIXME: Suta
-}
+@implementation NYSegmentLabel
 
 - (void)setMaskFrame:(CGRect)maskFrame {
     _maskFrame = maskFrame;
+    
     [self setNeedsDisplay];
 }
 
 - (void)setMaskCornerRadius:(CGFloat)maskCornerRadius {
     _maskCornerRadius = maskCornerRadius;
+    
     [self setNeedsDisplay];
 }
 
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     // Draw text normally
@@ -38,7 +39,10 @@
         CGContextSaveGState(context);
         
         // FIXME: Suta
-        CGContextTranslateCTM(context, 0, self.frame.size.height + [self textDeltaY]);
+        CGRect bounds = self.bounds;
+        BOOL needCorrect = !CGRectEqualToRect(rect, bounds);
+        CGFloat deltaY = needCorrect ? (CGRectGetHeight(rect) - CGRectGetHeight(bounds) - (CGRectGetHeight(rect) - CGRectGetHeight(bounds) + CGRectGetMinY(rect) * 2)) : 0;
+        CGContextTranslateCTM(context, 0, CGRectGetHeight(rect) - deltaY);
         
         CGContextScaleCTM(context, 1.0, (CGFloat) -1.0);
         
@@ -49,21 +53,11 @@
         CGContextSetFillColorWithColor(context, [self.alternativeTextColor CGColor]);
         
         // Path from mask
-        CGPathRef path;
-        
-        if (CGRectIsEmpty(self.maskFrame)) {
-            path = CGPathCreateMutable();
-        } else {
-            UIBezierPath *roundRectBezierPath = [UIBezierPath bezierPathWithRoundedRect:self.maskFrame
-                                                                           cornerRadius:self.maskCornerRadius];
-            path = CGPathCreateCopy([roundRectBezierPath CGPath]);
-        }
-        
+        CGPathRef path = [self pathForRoundedRect:self.maskFrame radius:self.maskCornerRadius];
         CGContextAddPath(context, path);
         
         // Fill the path
         CGContextFillPath(context);
-        CFRelease(path);
         
         // Clean up
         CGContextRestoreGState(context);
@@ -71,63 +65,20 @@
     }
 }
 
+- (CGPathRef)pathForRoundedRect:(CGRect)rect radius:(CGFloat)radius
+{
+    if (CGRectIsEmpty(rect)) {
+        return CGPathCreateMutable();
+    }
+    UIBezierPath* path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:radius];
+    return [path CGPath];
+}
+
 - (UIColor *)alternativeTextColor {
     if (!_alternativeTextColor) {
         _alternativeTextColor = self.textColor;
     }
-    
     return _alternativeTextColor;
-}
-
-#pragma mark - getter & setter
-
-// FIXME: Suta
-- (void)setText:(NSString *)text {
-    [super setText:text];
-    _textSize = [self.text sizeWithAttributes:@{NSFontAttributeName : self.font}];
-}
-
-// FIXME: Suta
-- (void)setFont:(UIFont *)font {
-    [super setFont:font];
-    _textSize = [self.text sizeWithAttributes:@{NSFontAttributeName : self.font}];
-}
-
-// FIXME: Suta
-- (CGFloat)textDeltaY {
-    if ([self textOnlyEnglish]) {
-        return 0;
-    }
-    if (![self textSystemFont]) {
-        return 0;
-    }
-    if (![self textBoldFont]) {
-        return _textSize.height / 9;
-    } else {
-        return _textSize.height / 22;
-    }
-}
-
-// FIXME: Suta
-- (BOOL)textOnlyEnglish {
-    NSString *myRegex = @"[A-Z0-9a-z_]*";
-    NSPredicate *myTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", myRegex];
-    NSString *string = self.text;
-    return [myTest evaluateWithObject:string];
-}
-
-// FIXME: Suta
-- (BOOL)textSystemFont {
-    BOOL systemFont = [self.font isEqual:[UIFont systemFontOfSize:self.font.pointSize]];
-    BOOL boldSystemFont = [self.font isEqual:[UIFont boldSystemFontOfSize:self.font.pointSize]];
-    return systemFont || boldSystemFont;
-}
-
-// FIXME: Suta
-- (BOOL)textBoldFont {
-    UIFontDescriptor *fontDescriptor = self.font.fontDescriptor;
-    UIFontDescriptorSymbolicTraits fontDescriptorSymbolicTraits = fontDescriptor.symbolicTraits;
-    return (fontDescriptorSymbolicTraits & UIFontDescriptorTraitBold) != 0;
 }
 
 @end
